@@ -34,8 +34,6 @@ class AdminAuthWrapper extends StatelessWidget {
             if (adminSnapshot.data == true) {
               return const AdminPanelScreen();
             } else {
-              // User is not an admin, show an unauthorized message and sign out
-              // Or you could redirect to a non-admin part of the app
               return Scaffold(
                 appBar: AppBar(title: const Text('Unauthorized')), 
                 body: Center(

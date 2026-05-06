@@ -20,7 +20,7 @@ class AdminAuthService {
     try {
       return await _auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {
-      print(e); // Handle error appropriately
+      // Handle error appropriately
       return null;
     }
   }
@@ -38,7 +38,7 @@ class AdminAuthService {
 
       return userCredential;
     } catch (e) {
-      print(e); // Handle error appropriately
+      // Handle error appropriately
       return null;
     }
   }
@@ -61,7 +61,6 @@ class AdminAuthService {
       }
       return false;
     } catch (e) {
-      print(e);
       return false;
     }
   }

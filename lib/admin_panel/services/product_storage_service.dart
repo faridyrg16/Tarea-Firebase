@@ -21,7 +21,7 @@ class ProductStorageService {
       TaskSnapshot snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      print(e); // Handle error
+      // Handle error
       return null;
     }
   }
