@@ -4,22 +4,37 @@ import '../models/student.dart';
 import '../services/student_firestore_service.dart';
 import 'student_form_screen.dart';
 
-class StudentListScreen extends StatelessWidget {
+class StudentListScreen extends StatefulWidget {
   const StudentListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final studentService = StudentFirestoreService();
+  State<StudentListScreen> createState() => _StudentListScreenState();
+}
 
+class _StudentListScreenState extends State<StudentListScreen> {
+  final StudentFirestoreService studentService = StudentFirestoreService();
+  late Stream<List<Student>> studentsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    studentsStream = studentService.getStudents();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Student Registry'),
       ),
       body: StreamBuilder<List<Student>>(
-        stream: studentService.getStudents(),
+        stream: studentsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No students found. Add one!'));
