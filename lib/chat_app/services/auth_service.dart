@@ -17,7 +17,7 @@ class AuthService {
 
       // Obtain the auth details from the request
       if (googleUser == null) return null; // The user canceled the sign-in
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
       // Create a new credential
       final AuthCredential credential = GoogleAuthProvider.credential(
