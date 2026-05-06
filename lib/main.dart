@@ -1,48 +1,23 @@
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+import 'firebase_options.dart';
+import 'task_manager/auth_wrapper.dart';
+import 'student_registry/screens/student_list_screen.dart';
+import 'chat_app/auth_wrapper.dart';
+import 'admin_panel/auth_wrapper.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
-// 1. App de Gestión de Tareas (To-Do con usuarios)
-class TaskManagerApp extends StatelessWidget {
-  const TaskManagerApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('1. Gestión de Tareas')),
-      body: const Center(child: Text('Pantalla de Gestión de Tareas')),
-    );
-  }
-}
-
-// 2. Sistema de Registro de Estudiantes
-class StudentRegistryApp extends StatelessWidget {
-  const StudentRegistryApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('2. Registro de Estudiantes')),
-      body: const Center(child: Text('Pantalla de Registro de Estudiantes')),
-    );
-  }
-}
-
-// 3. Chat en Tiempo Real
-class ChatApp extends StatelessWidget {
-  const ChatApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('3. Chat en Tiempo Real')),
-      body: const Center(child: Text('Pantalla de Chat')),
-    );
-  }
-}
-
-// 4. Sistema de Notas con Imágenes
+// 4. Sistema de Notas con Imágenes (Placeholder)
 class NotesApp extends StatelessWidget {
   const NotesApp({super.key});
   @override
@@ -50,18 +25,6 @@ class NotesApp extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('4. Notas con Imágenes')),
       body: const Center(child: Text('Pantalla de Notas con Imágenes')),
-    );
-  }
-}
-
-// 5. Panel de Administración de Productos
-class AdminPanelApp extends StatelessWidget {
-  const AdminPanelApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('5. Panel de Administración')),
-      body: const Center(child: Text('Pantalla de Panel de Administración')),
     );
   }
 }
@@ -77,31 +40,31 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'task-manager',
           builder: (BuildContext context, GoRouterState state) {
-            return const TaskManagerApp();
+            return const AuthWrapper();
           },
         ),
         GoRoute(
           path: 'student-registry',
           builder: (BuildContext context, GoRouterState state) {
-            return const StudentRegistryApp();
+            return const StudentListScreen();
           },
         ),
         GoRoute(
           path: 'chat',
           builder: (BuildContext context, GoRouterState state) {
-            return const ChatApp();
+            return const ChatAuthWrapper();
           },
         ),
         GoRoute(
           path: 'notes',
           builder: (BuildContext context, GoRouterState state) {
-            return const NotesApp();
+            return const NotesApp(); 
           },
         ),
         GoRoute(
           path: 'admin-panel',
           builder: (BuildContext context, GoRouterState state) {
-            return const AdminPanelApp();
+            return const AdminAuthWrapper();
           },
         ),
       ],

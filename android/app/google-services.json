@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "417701666037",
+    "project_id": "pruebitas-f70ca",
+    "storage_bucket": "pruebitas-f70ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:417701666037:android:345872e311c354177ab9bc",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtKYfNepMg5ed3wIuxuXxGbKC7upjcBoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:417701666037:android:5f860989a252acf67ab9bc",
+        "android_client_info": {
+          "package_name": "com.pruebitas.farid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtKYfNepMg5ed3wIuxuXxGbKC7upjcBoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
