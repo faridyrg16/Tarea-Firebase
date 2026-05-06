@@ -9,20 +9,20 @@ class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({super.key});
 
   @override
-  _AdminPanelScreenState createState() => _AdminPanelScreenState();
+  AdminPanelScreenState createState() => AdminPanelScreenState();
 }
 
-class _AdminPanelScreenState extends State<AdminPanelScreen> {
-  final _productService = ProductFirestoreService();
-  final _authService = AdminAuthService();
+class AdminPanelScreenState extends State<AdminPanelScreen> {
+  final productService = ProductFirestoreService();
+  final authService = AdminAuthService();
 
-  void _navigateAndAddProduct() async {
+  void navigateAndAddProduct() async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const ProductFormScreen()),
     );
   }
 
-  void _navigateAndEditProduct(Product product) async {
+  void navigateAndEditProduct(Product product) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ProductFormScreen(product: product),
@@ -38,13 +38,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _authService.signOut(),
+            onPressed: () => authService.signOut(),
             tooltip: 'Sign Out',
           ),
         ],
       ),
       body: StreamBuilder<List<Product>>(
-        stream: _productService.getProducts(),
+        stream: productService.getProducts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -78,11 +78,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _navigateAndEditProduct(product),
+                          onPressed: () => navigateAndEditProduct(product),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _productService.deleteProduct(product.id),
+                          onPressed: () => productService.deleteProduct(product.id),
                         ),
                       ],
                     )),
@@ -94,9 +94,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _navigateAndAddProduct,
-        child: const Icon(Icons.add),
+        onPressed: navigateAndAddProduct,
         tooltip: 'Add Product',
+        child: const Icon(Icons.add),
       ),
     );
   }

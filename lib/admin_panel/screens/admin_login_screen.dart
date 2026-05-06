@@ -6,30 +6,30 @@ class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
 
   @override
-  _AdminLoginScreenState createState() => _AdminLoginScreenState();
+  AdminLoginScreenState createState() => AdminLoginScreenState();
 }
 
-class _AdminLoginScreenState extends State<AdminLoginScreen> {
-  final _authService = AdminAuthService();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _isLogin = true;
-  String? _errorMessage;
+class AdminLoginScreenState extends State<AdminLoginScreen> {
+  final authService = AdminAuthService();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  bool isLogin = true;
+  String? errorMessage;
 
-  void _submit() async {
-    if (_formKey.currentState!.validate()) {
+  void submit() async {
+    if (formKey.currentState!.validate()) {
       setState(() {
-        _errorMessage = null;
+        errorMessage = null;
       });
 
-      final user = _isLogin
-          ? await _authService.signIn(_emailController.text, _passwordController.text)
-          : await _authService.register(_emailController.text, _passwordController.text);
+      final user = isLogin
+          ? await authService.signIn(emailController.text, passwordController.text)
+          : await authService.register(emailController.text, passwordController.text);
 
       if (user == null) {
         setState(() {
-          _errorMessage = _isLogin
+          errorMessage = isLogin
               ? 'Failed to sign in. Check your credentials.'
               : 'Failed to register. The email might be in use.';
         });
@@ -41,46 +41,46 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isLogin ? 'Admin Login' : 'Admin Register'),
+        title: Text(isLogin ? 'Admin Login' : 'Admin Register'),
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextFormField(
-                  controller: _emailController,
+                  controller: emailController,
                   decoration: const InputDecoration(labelText: 'Email'),
                   validator: (value) => value!.isEmpty ? 'Enter an email' : null,
                 ),
                 TextFormField(
-                  controller: _passwordController,
+                  controller: passwordController,
                   decoration: const InputDecoration(labelText: 'Password'),
                   obscureText: true,
                   validator: (value) => value!.length < 6 ? 'Password must be at least 6 characters' : null,
                 ),
                 const SizedBox(height: 20),
-                if (_errorMessage != null)
+                if (errorMessage != null)
                   Text(
-                    _errorMessage!,
+                    errorMessage!,
                     style: const TextStyle(color: Colors.red),
                   ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _submit,
-                  child: Text(_isLogin ? 'Login' : 'Register'),
+                  onPressed: submit,
+                  child: Text(isLogin ? 'Login' : 'Register'),
                 ),
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      _isLogin = !_isLogin;
-                      _errorMessage = null;
+                      isLogin = !isLogin;
+                      errorMessage = null;
                     });
                   },
-                  child: Text(_isLogin ? 'Need an account? Register' : 'Have an account? Login'),
+                  child: Text(isLogin ? 'Need an account? Register' : 'Have an account? Login'),
                 ),
               ],
             ),

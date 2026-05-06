@@ -12,54 +12,55 @@ class ProductFormScreen extends StatefulWidget {
   const ProductFormScreen({super.key, this.product});
 
   @override
-  _ProductFormScreenState createState() => _ProductFormScreenState();
+  ProductFormScreenState createState() => ProductFormScreenState();
 }
 
-class _ProductFormScreenState extends State<ProductFormScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _firestoreService = ProductFirestoreService();
-  final _storageService = ProductStorageService();
+class ProductFormScreenState extends State<ProductFormScreen> {
+  final formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  final priceController = TextEditingController();
+  final firestoreService = ProductFirestoreService();
+  final storageService = ProductStorageService();
 
-  XFile? _imageFile;
-  String? _imageUrl;
-  bool _isLoading = false;
+  XFile? imageFile;
+  String? imageUrl;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     if (widget.product != null) {
-      _nameController.text = widget.product!.name;
-      _priceController.text = widget.product!.price.toString();
-      _imageUrl = widget.product!.imageUrl;
+      nameController.text = widget.product!.name;
+      priceController.text = widget.product!.price.toString();
+      imageUrl = widget.product!.imageUrl;
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _storageService.pickImage();
+  Future<void> pickImage() async {
+    final pickedFile = await storageService.pickImage();
     if (pickedFile != null) {
       setState(() {
-        _imageFile = pickedFile;
+        imageFile = pickedFile;
       });
     }
   }
 
-  Future<void> _saveProduct() async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> saveProduct() async {
+    if (formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = true;
+        isLoading = true;
       });
 
-      String? imageUrl = _imageUrl;
-      if (_imageFile != null) {
-        imageUrl = await _storageService.uploadImage(_imageFile!); 
+      String? uploadedImageUrl = imageUrl;
+      if (imageFile != null) {
+        uploadedImageUrl = await storageService.uploadImage(imageFile!); 
       }
 
-      if (imageUrl == null) {
-        // Handle error: show a snackbar or alert
+      if (!mounted) return;
+
+      if (uploadedImageUrl == null) {
         setState(() {
-          _isLoading = false;
+          isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to upload image. Please try again.')),
@@ -69,17 +70,18 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
       final product = Product(
         id: widget.product?.id ?? '', // Firestore will generate if empty
-        name: _nameController.text,
-        price: double.parse(_priceController.text),
-        imageUrl: imageUrl,
+        name: nameController.text,
+        price: double.parse(priceController.text),
+        imageUrl: uploadedImageUrl,
       );
 
       if (widget.product == null) {
-        await _firestoreService.addProduct(product);
+        await firestoreService.addProduct(product);
       } else {
-        await _firestoreService.updateProduct(product);
+        await firestoreService.updateProduct(product);
       }
 
+      if (!mounted) return;
       Navigator.of(context).pop();
     }
   }
@@ -90,21 +92,21 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       appBar: AppBar(
         title: Text(widget.product == null ? 'Add Product' : 'Edit Product'),
       ),
-      body: _isLoading
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: ListView(
                   children: [
                     TextFormField(
-                      controller: _nameController,
+                      controller: nameController,
                       decoration: const InputDecoration(labelText: 'Product Name'),
                       validator: (value) => value!.isEmpty ? 'Please enter a name' : null,
                     ),
                     TextFormField(
-                      controller: _priceController,
+                      controller: priceController,
                       decoration: const InputDecoration(labelText: 'Price'),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       validator: (value) {
@@ -114,10 +116,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    _buildImagePicker(),
+                    buildImagePicker(),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: _saveProduct,
+                      onPressed: saveProduct,
                       child: const Text('Save Product'),
                     ),
                   ],
@@ -127,23 +129,23 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
-  Widget _buildImagePicker() {
+  Widget buildImagePicker() {
     return Column(
       children: [
-        if (_imageFile != null)
+        if (imageFile != null)
           Image.file(
-            File(_imageFile!.path),
+            File(imageFile!.path),
             height: 150,
           )
-        else if (_imageUrl != null)
+        else if (imageUrl != null)
           Image.network(
-            _imageUrl!,
+            imageUrl!,
             height: 150,
           ),
         TextButton.icon(
           icon: const Icon(Icons.image),
           label: const Text('Select Image'),
-          onPressed: _pickImage,
+          onPressed: pickImage,
         ),
       ],
     );

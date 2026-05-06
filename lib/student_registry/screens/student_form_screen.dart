@@ -9,38 +9,38 @@ class StudentFormScreen extends StatefulWidget {
   const StudentFormScreen({super.key, this.student});
 
   @override
-  _StudentFormScreenState createState() => _StudentFormScreenState();
+  StudentFormScreenState createState() => StudentFormScreenState();
 }
 
-class _StudentFormScreenState extends State<StudentFormScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _studentService = StudentFirestoreService();
+class StudentFormScreenState extends State<StudentFormScreen> {
+  final formKey = GlobalKey<FormState>();
+  final studentService = StudentFirestoreService();
 
-  late String _name;
-  late int _age;
-  late String _course;
+  late String name;
+  late int age;
+  late String course;
 
   @override
   void initState() {
     super.initState();
-    _name = widget.student?.name ?? '';
-    _age = widget.student?.age ?? 0;
-    _course = widget.student?.course ?? '';
+    name = widget.student?.name ?? '';
+    age = widget.student?.age ?? 0;
+    course = widget.student?.course ?? '';
   }
 
-  void _saveForm() {
-    final isValid = _formKey.currentState!.validate();
+  void saveForm() {
+    final isValid = formKey.currentState!.validate();
     if (!isValid) {
       return;
     }
-    _formKey.currentState!.save();
+    formKey.currentState!.save();
 
     if (widget.student == null) {
       // Add new student
-      _studentService.addStudent(_name, _age, _course);
+      studentService.addStudent(name, age, course);
     } else {
       // Update existing student
-      _studentService.updateStudent(widget.student!.id, _name, _age, _course);
+      studentService.updateStudent(widget.student!.id, name, age, course);
     }
 
     Navigator.of(context).pop();
@@ -55,18 +55,18 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: <Widget>[
               TextFormField(
-                initialValue: _name,
+                initialValue: name,
                 decoration: const InputDecoration(labelText: 'Name'),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a name.' : null,
-                onSaved: (value) => _name = value!,
+                onSaved: (value) => name = value!,
               ),
               TextFormField(
-                initialValue: _age == 0 ? '' : _age.toString(),
+                initialValue: age == 0 ? '' : age.toString(),
                 decoration: const InputDecoration(labelText: 'Age'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -75,18 +75,18 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   if (int.parse(value) <= 0) return 'Please enter a positive age.';
                   return null;
                 },
-                onSaved: (value) => _age = int.parse(value!),
+                onSaved: (value) => age = int.parse(value!),
               ),
               TextFormField(
-                initialValue: _course,
+                initialValue: course,
                 decoration: const InputDecoration(labelText: 'Course'),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a course.' : null,
-                onSaved: (value) => _course = value!,
+                onSaved: (value) => course = value!,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _saveForm,
+                onPressed: saveForm,
                 child: const Text('Save'),
               ),
             ],

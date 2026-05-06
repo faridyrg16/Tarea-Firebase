@@ -10,10 +10,10 @@ class AdminAuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _authService = AdminAuthService();
+    final authService = AdminAuthService();
 
     return StreamBuilder<User?>(
-      stream: _authService.user,
+      stream: authService.user,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -25,7 +25,7 @@ class AdminAuthWrapper extends StatelessWidget {
         }
 
         return FutureBuilder<bool>(
-          future: _authService.isAdmin(),
+          future: authService.isAdmin(),
           builder: (context, adminSnapshot) {
             if (adminSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -43,7 +43,7 @@ class AdminAuthWrapper extends StatelessWidget {
                       const Text('You do not have permission to access this page.'),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () => _authService.signOut(),
+                        onPressed: () => authService.signOut(),
                         child: const Text('Logout'),
                       )
                     ],

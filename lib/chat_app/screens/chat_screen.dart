@@ -9,29 +9,29 @@ class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  ChatScreenState createState() => ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
-  final _chatService = ChatService();
-  final _authService = AuthService();
-  final _messageController = TextEditingController();
-  final _scrollController = ScrollController();
+class ChatScreenState extends State<ChatScreen> {
+  final chatService = ChatService();
+  final authService = AuthService();
+  final messageController = TextEditingController();
+  final scrollController = ScrollController();
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
-      _chatService.sendMessage(_messageController.text.trim());
-      _messageController.clear();
+  void sendMessage() {
+    if (messageController.text.trim().isNotEmpty) {
+      chatService.sendMessage(messageController.text.trim());
+      messageController.clear();
       // Scroll to the bottom after sending a message
-      _scrollToBottom();
+      scrollToBottom();
     }
   }
 
-  void _scrollToBottom() {
+  void scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _authService.signOut(),
+            onPressed: () => authService.signOut(),
             tooltip: 'Sign Out',
           ),
         ],
@@ -58,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: StreamBuilder<List<Message>>(
-              stream: _chatService.getMessages(),
+              stream: chatService.getMessages(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -68,28 +68,28 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
 
                 final messages = snapshot.data!;
-                _scrollToBottom(); // Scroll to bottom when new messages arrive
+                scrollToBottom(); // Scroll to bottom when new messages arrive
 
                 return ListView.builder(
-                  controller: _scrollController,
+                  controller: scrollController,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
                     final isMe = message.senderId == currentUser?.uid;
 
-                    return _buildMessageBubble(message, isMe);
+                    return buildMessageBubble(message, isMe);
                   },
                 );
               },
             ),
           ),
-          _buildMessageInputField(),
+          buildMessageInputField(),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(Message message, bool isMe) {
+  Widget buildMessageBubble(Message message, bool isMe) {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -114,24 +114,24 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildMessageInputField() {
+  Widget buildMessageInputField() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
           Expanded(
             child: TextField(
-              controller: _messageController,
+              controller: messageController,
               decoration: const InputDecoration(
                 hintText: 'Enter a message...',
                 border: OutlineInputBorder(),
               ),
-              onSubmitted: (_) => _sendMessage(),
+              onSubmitted: (_) => sendMessage(),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.send, color: Colors.blue),
-            onPressed: _sendMessage,
+            onPressed: sendMessage,
           ),
         ],
       ),

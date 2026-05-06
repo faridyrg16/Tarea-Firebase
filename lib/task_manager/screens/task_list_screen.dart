@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,35 +10,38 @@ class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
 
   @override
-  _TaskListScreenState createState() => _TaskListScreenState();
+  TaskListScreenState createState() => TaskListScreenState();
 }
 
-class _TaskListScreenState extends State<TaskListScreen> {
-  final FirestoreService _firestoreService = FirestoreService();
-  final TextEditingController _taskController = TextEditingController();
-  TaskFilter _currentFilter = TaskFilter.all;
+class TaskListScreenState extends State<TaskListScreen> {
+  final FirestoreService firestoreService = FirestoreService();
+  final TextEditingController taskController = TextEditingController();
+  TaskFilter currentFilter = TaskFilter.all;
 
-  void _addTask() {
-    if (_taskController.text.isNotEmpty) {
-      _firestoreService.addTask(_taskController.text);
-      _taskController.clear();
+  void addTask() {
+    if (taskController.text.isNotEmpty) {
+      firestoreService.addTask(taskController.text);
+      taskController.clear();
       Navigator.pop(context); // Close the dialog
     }
   }
 
-  void _showAddTaskDialog() {
+  void showAddTaskDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('New Task'),
         content: TextField(
-          controller: _taskController,
+          controller: taskController,
           autofocus: true,
           decoration: const InputDecoration(labelText: 'Task Title'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(onPressed: _addTask, child: const Text('Add')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(onPressed: addTask, child: const Text('Add')),
         ],
       ),
     );
@@ -52,11 +54,17 @@ class _TaskListScreenState extends State<TaskListScreen> {
         title: const Text('My Tasks'),
         actions: [
           PopupMenuButton<TaskFilter>(
-            onSelected: (filter) => setState(() => _currentFilter = filter),
+            onSelected: (filter) => setState(() => currentFilter = filter),
             itemBuilder: (context) => [
               const PopupMenuItem(value: TaskFilter.all, child: Text('All')),
-              const PopupMenuItem(value: TaskFilter.pending, child: Text('Pending')),
-              const PopupMenuItem(value: TaskFilter.completed, child: Text('Completed')),
+              const PopupMenuItem(
+                value: TaskFilter.pending,
+                child: Text('Pending'),
+              ),
+              const PopupMenuItem(
+                value: TaskFilter.completed,
+                child: Text('Completed'),
+              ),
             ],
           ),
           IconButton(
@@ -66,7 +74,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
         ],
       ),
       body: StreamBuilder<List<Task>>(
-        stream: _firestoreService.getTasks(),
+        stream: firestoreService.getTasks(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -75,7 +83,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
             return const Center(child: Text('No tasks yet. Add one!'));
           }
 
-          final tasks = _getFilteredTasks(snapshot.data!);
+          final tasks = getFilteredTasks(snapshot.data!);
 
           return ListView.builder(
             itemCount: tasks.length,
@@ -84,17 +92,20 @@ class _TaskListScreenState extends State<TaskListScreen> {
               return ListTile(
                 leading: Checkbox(
                   value: task.isCompleted,
-                  onChanged: (val) => _firestoreService.updateTask(task.id, val!),
+                  onChanged: (val) =>
+                      firestoreService.updateTask(task.id, val!),
                 ),
                 title: Text(
                   task.title,
                   style: TextStyle(
-                    decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                    decoration: task.isCompleted
+                        ? TextDecoration.lineThrough
+                        : null,
                   ),
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _firestoreService.deleteTask(task.id),
+                  onPressed: () => firestoreService.deleteTask(task.id),
                 ),
               );
             },
@@ -102,20 +113,19 @@ class _TaskListScreenState extends State<TaskListScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddTaskDialog,
+        onPressed: showAddTaskDialog,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  List<Task> _getFilteredTasks(List<Task> tasks) {
-    switch (_currentFilter) {
+  List<Task> getFilteredTasks(List<Task> tasks) {
+    switch (currentFilter) {
       case TaskFilter.pending:
         return tasks.where((task) => !task.isCompleted).toList();
       case TaskFilter.completed:
         return tasks.where((task) => task.isCompleted).toList();
       case TaskFilter.all:
-      default:
         return tasks;
     }
   }
